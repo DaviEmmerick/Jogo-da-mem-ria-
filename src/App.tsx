@@ -1,10 +1,10 @@
-import { Card } from "./components/Card";
+import { JogoDaMemoria } from "./components/Card";
 
 export function App() {
 
   return (
     <>
-    <Card />
+    <JogoDaMemoria/>
     </>
   )
 }

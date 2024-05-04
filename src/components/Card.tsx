@@ -1,34 +1,34 @@
 import { useState } from 'react';
 import { Container, Box, Order, Title, Moves, Reset, CardIcon, Cards, Central } from './Card-Style';
 
-interface Card {
+interface Carta {
   id: number;
-  value: string;
-  isFlipped: boolean;
-  isMatched: boolean;
+  valor: string;
+  estaVirada: boolean;
+  estaCorrespondida: boolean;
 }
 
-export function Card() {
-  const maxAttempts = 10;
-  const [cards, setCards] = useState<Card[]>(generateCards());
-  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
-  const [matchedPairs, setMatchedPairs] = useState<number>(0);
-  const [attempts, setAttempts] = useState<number>(maxAttempts);
+export function JogoDaMemoria() {
+  const maxTentativas = 10;
+  const [cartas, setCartas] = useState<Carta[]>(gerarCartas());
+  const [cartaSelecionada, setCartaSelecionada] = useState<Carta | null>(null);
+  const [paresCorrespondidos, setParesCorrespondidos] = useState<number>(0);
+  const [tentativas, setTentativas] = useState<number>(maxTentativas);
 
-  function generateCards() {
-    const values = ["A", "B", "C", "D", "E", "F", "A", "B", "C", "D", "E", "F"];
+  function gerarCartas() {
+    const valores = ["A", "B", "C", "D", "E", "F", "A", "B", "C", "D", "E", "F"];
     
-    const shuffledValues = shuffleArray(values);
-    const generatedCards: Card[] = shuffledValues.map((value, index) => ({
-      value,
-      isFlipped: false,
-      isMatched: false,
-      id: index
+    const valoresEmbaralhados = embaralharArray(valores);
+    const cartasGeradas: Carta[] = valoresEmbaralhados.map((valor, indice) => ({
+      valor,
+      estaVirada: false,
+      estaCorrespondida: false,
+      id: indice
     }));
-    return generatedCards;
+    return cartasGeradas;
   }
 
-  function shuffleArray(array: string[]) {
+  function embaralharArray(array: string[]) {
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [array[i], array[j]] = [array[j], array[i]];
@@ -36,41 +36,41 @@ export function Card() {
     return array;
   }
 
-  function handleClick(clickedCard: Card) {
-    if (clickedCard.isFlipped || selectedCard === clickedCard || clickedCard.isMatched || attempts <= 0) return;
+  function handleClick(cartaClicada: Carta) {
+    if (cartaClicada.estaVirada || cartaSelecionada === cartaClicada || cartaClicada.estaCorrespondida || tentativas <= 0) return;
   
-    const newCards = cards.map(card =>
-      card === clickedCard ? { ...card, isFlipped: true } : card
+    const novasCartas = cartas.map(carta =>
+      carta === cartaClicada ? { ...carta, estaVirada: true } : carta
     );
-    setCards(newCards);
+    setCartas(novasCartas);
   
-    if (selectedCard) {
-      if (selectedCard.value === clickedCard.value) {
-        setMatchedPairs(matchedPairs + 1);
-        const matchedCards = newCards.map(card =>
-          card.value === selectedCard.value ? { ...card, isMatched: true } : card
+    if (cartaSelecionada) {
+      if (cartaSelecionada.valor === cartaClicada.valor) {
+        setParesCorrespondidos(paresCorrespondidos + 1);
+        const cartasCorrespondidas = novasCartas.map(carta =>
+          carta.valor === cartaSelecionada.valor ? { ...carta, estaCorrespondida: true } : carta
         );
-        setCards(matchedCards);
+        setCartas(cartasCorrespondidas);
       } else {
         setTimeout(() => {
-          const resetCards = newCards.map(card =>
-            card.isFlipped ? { ...card, isFlipped: false } : card
+          const resetarCartas = novasCartas.map(carta =>
+            carta.estaVirada ? { ...carta, estaVirada: false } : carta
           );
-          setCards(resetCards);
+          setCartas(resetarCartas);
         }, 1000);
-        setAttempts(attempts - 1); 
+        setTentativas(tentativas - 1); 
       }
-      setSelectedCard(null);
+      setCartaSelecionada(null);
     } else {
-      setSelectedCard(clickedCard);
+      setCartaSelecionada(cartaClicada);
     }
   }
   
-  function handleRestart() {
-    setMatchedPairs(0);
-    setAttempts(maxAttempts);
-    setCards(generateCards());
-    setSelectedCard(null);
+  function reiniciarJogo() {
+    setParesCorrespondidos(0);
+    setTentativas(maxTentativas);
+    setCartas(gerarCartas());
+    setCartaSelecionada(null);
   }
 
   return (
@@ -78,16 +78,16 @@ export function Card() {
       <Box>
         <Title><strong>Jogo da Memória!</strong></Title>
         <Order>
-          <Moves>Acertos: {matchedPairs}</Moves>
-          <Moves>Tentativas: {attempts}</Moves>
-          <Reset onClick={handleRestart}>Recomeçar</Reset>
+          <Moves>Acertos: {paresCorrespondidos}</Moves>
+          <Moves>Tentativas: {tentativas}</Moves>
+          <Reset onClick={reiniciarJogo}>Recomeçar</Reset>
         </Order>
       </Box>
       <Central>
         <Cards>
-          {cards.map((card, index) => (
-            <CardIcon key={index} onClick={() => handleClick(card)}>
-              {card.isFlipped || card.isMatched ? card.value : "?"}
+          {cartas.map((carta, indice) => (
+            <CardIcon key={indice} onClick={() => handleClick(carta)}>
+              {carta.estaVirada || carta.estaCorrespondida ? carta.valor : "?"}
             </CardIcon>
           ))}
         </Cards>
